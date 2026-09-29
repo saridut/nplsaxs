@@ -135,62 +135,64 @@ sp.add_argument('--debyer_cmd',
                     default='debyer',
                     help="If using Debyer, the name of the executable.")
 
-args = parser.parse_args()
 
-if args.subcommand == 'collate':
-    fns = glob.glob(args.glob_pattern)
-    nfiles = len(fns)
-    if nfiles == 0:
-        print(f"No files matching {args.glob_pattern} found. Exiting ...")
-        raise SystemExit()
-    else:
-        print(f"Number of files = {nfiles}")
-        #Open the first file
-        with np.load(fns[0]) as fh:
-            length = fh['length']
-            print(f"length = {length}")
-            width = fh['width']
-            print(f"width = {width}")
-            Q = fh['Q']
-            print(f"Q vector dimension = {Q.size}")
-            nsamp = fh['pattern'].shape[0]
-            print(f"Number of samples per file = {nsamp}")
-            pattern = np.zeros((nsamp*nfiles, Q.size), dtype=np.float64)
-            dist_pars = np.zeros((nsamp*nfiles,fh['dist_pars'].shape[1]),
-                                 dtype=np.float64)
-            print(f"Number of distribution parameters per sample"
-                  f" = {dist_pars.shape[1]}.")
-        for i, fn in enumerate(fns):
-            with np.load(fn) as fh:
-                ibeg = i*nsamp
-                iend = (i+1)*nsamp
-                dist_pars[ibeg:iend,:] = fh['dist_pars']
-                pattern[ibeg:iend,:] = fh['pattern']
-        fn_out = args.coutfile
-        np.savez_compressed(fn_out, length=length, width=width,
-                        dist_pars=dist_pars, Q=Q, pattern=pattern)
-elif args.subcommand == 'create':
-    length = args.length*10 #From nm to angstrom
-    width = args.width*10 #From nm to angstrom
-    nlayers = 2*args.ML + 1
-    radius = (args.rdist, args.rmin*10, args.rmax*10, args.rpd)
-    pitch = (args.pdist, args.pmin*10, args.pmax*10, args.ppd)
-    nsamp = args.nsamp
-    phi = args.phi
-    npart = args.npart
-    calculator = args.calculator
-    Qbeg = args.Qbeg/10 #From 1/nm to 1/angstrom
-    Qend = args.Qend/10 #From 1/nm to 1/angstrom
-    Qstep = args.Qstep/10 #From 1/nm to 1/angstrom
-    fn_out = args.outfile
-    pattern_type = args.pattern_type
-    nthreads = args.nthreads
-    ncells = args.ncells
-    debyer_cmd = args.debyer_cmd
+if __name__ == '__main__':
+    args = parser.parse_args()
     
-    create(fn_out=fn_out, length=length, width=width, nlayers=nlayers,
-           radius=radius, pitch=pitch, nsamp=nsamp, phi=phi,
-           npart=npart, calculator=calculator,
-           pattern_type=pattern_type, Qbeg=Qbeg, Qend=Qend,
-           Qstep=Qstep, nthreads=nthreads, ncells=ncells,
-           debyer_cmd=debyer_cmd)
+    if args.subcommand == 'collate':
+        fns = glob.glob(args.glob_pattern)
+        nfiles = len(fns)
+        if nfiles == 0:
+            print(f"No files matching {args.glob_pattern} found. Exiting ...")
+            raise SystemExit()
+        else:
+            print(f"Number of files = {nfiles}")
+            #Open the first file
+            with np.load(fns[0]) as fh:
+                length = fh['length']
+                print(f"length = {length}")
+                width = fh['width']
+                print(f"width = {width}")
+                Q = fh['Q']
+                print(f"Q vector dimension = {Q.size}")
+                nsamp = fh['pattern'].shape[0]
+                print(f"Number of samples per file = {nsamp}")
+                pattern = np.zeros((nsamp*nfiles, Q.size), dtype=np.float64)
+                dist_pars = np.zeros((nsamp*nfiles,fh['dist_pars'].shape[1]),
+                                     dtype=np.float64)
+                print(f"Number of distribution parameters per sample"
+                      f" = {dist_pars.shape[1]}.")
+            for i, fn in enumerate(fns):
+                with np.load(fn) as fh:
+                    ibeg = i*nsamp
+                    iend = (i+1)*nsamp
+                    dist_pars[ibeg:iend,:] = fh['dist_pars']
+                    pattern[ibeg:iend,:] = fh['pattern']
+            fn_out = args.coutfile
+            np.savez_compressed(fn_out, length=length, width=width,
+                            dist_pars=dist_pars, Q=Q, pattern=pattern)
+    elif args.subcommand == 'create':
+        length = args.length*10 #From nm to angstrom
+        width = args.width*10 #From nm to angstrom
+        nlayers = 2*args.ML + 1
+        radius = (args.rdist, args.rmin*10, args.rmax*10, args.rpd)
+        pitch = (args.pdist, args.pmin*10, args.pmax*10, args.ppd)
+        nsamp = args.nsamp
+        phi = args.phi
+        npart = args.npart
+        calculator = args.calculator
+        Qbeg = args.Qbeg/10 #From 1/nm to 1/angstrom
+        Qend = args.Qend/10 #From 1/nm to 1/angstrom
+        Qstep = args.Qstep/10 #From 1/nm to 1/angstrom
+        fn_out = args.outfile
+        pattern_type = args.pattern_type
+        nthreads = args.nthreads
+        ncells = args.ncells
+        debyer_cmd = args.debyer_cmd
+        
+        create(fn_out=fn_out, length=length, width=width, nlayers=nlayers,
+               radius=radius, pitch=pitch, nsamp=nsamp, phi=phi,
+               npart=npart, calculator=calculator,
+               pattern_type=pattern_type, Qbeg=Qbeg, Qend=Qend,
+               Qstep=Qstep, nthreads=nthreads, ncells=ncells,
+               debyer_cmd=debyer_cmd)
