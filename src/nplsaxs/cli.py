@@ -1,4 +1,4 @@
-#!/usr/bin/env python -m
+#!/usr/bin/env python
 
 import argparse
 import sys
@@ -135,8 +135,7 @@ sp.add_argument('--debyer_cmd',
                     default='debyer',
                     help="If using Debyer, the name of the executable.")
 
-
-if __name__ == '__main__':
+def run():
     args = parser.parse_args()
     
     if args.subcommand == 'collate':

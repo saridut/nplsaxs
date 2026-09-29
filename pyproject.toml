@@ -30,7 +30,7 @@ repository = "https://github.com/saridut/nplsaxs.git"
 #download = 
 
 [project.scripts]
-saxsds = "nplsaxs:cli"
+saxsds = "nplsaxs:cli.run"
 
 [tool.setuptools.dynamic]
 version = {attr = "nplsaxs.__version__"} 

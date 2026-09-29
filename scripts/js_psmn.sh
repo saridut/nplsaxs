@@ -18,7 +18,7 @@
 #module load foss/2025a
 #conda activate saxs
 
-SLURM_ARRAY_TASK_ID=4
+SLURM_ARRAY_TASK_ID=0
 
 dn='outdir'
 if [ ! -d "${dn}" ]; then
@@ -30,7 +30,7 @@ width=10    #nm
 ML=3        #num monolayers
 
 #python -m nplsaxs.cli create \
-python -m nplsaxs.cli create \
+saxsds create \
     --rdist lognormal \
     --rmin 5 \
     --rmax 20 \
@@ -40,9 +40,9 @@ python -m nplsaxs.cli create \
     --pmax 50 \
     --ppd 1.2 \
     --outfile "${dn}/ds_${SLURM_ARRAY_TASK_ID}.npz" \
-    --nsamp 20 \
+    --nsamp 2 \
     --phi 0.001 \
-    --npart 512 \
+    --npart 2 \
     --calculator 'AESDebye' \
     --pattern_type 'x'      \
     --Qbeg 0.01 \
