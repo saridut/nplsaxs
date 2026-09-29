@@ -170,7 +170,8 @@ def create(fn_out='out.npz', length=None, width=None, nlayers=None,
     Q_sample = None
     pattern_sample= None
     for isamp in range(nsamp):
-        #print(f"isamp = {isamp}")
+        if (isamp+1)%10 == 0:
+            print(f"isamp = {isamp}")
         sample_rp(length, width, radius, pitch, rng, dist_pars[isamp,:],
                   r_vals, p_vals)
         #print(f"Distribution parameters: {dist_pars[isamp,:]}")

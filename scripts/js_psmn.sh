@@ -18,7 +18,8 @@
 #module load foss/2025a
 #conda activate saxs
 
-SLURM_ARRAY_TASK_ID=0
+#export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK} 
+SLURM_ARRAY_TASK_ID=1
 
 dn='outdir'
 if [ ! -d "${dn}" ]; then
