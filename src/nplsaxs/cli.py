@@ -47,18 +47,18 @@ sp.add_argument('--rdist',
 sp.add_argument('--rmin',
                     type=float,
                     default=10.0,
-                    help="Lower bound of radius (nm)."
+                    help="Lower bound of radius (nm). Must be > 0."
                     )
 sp.add_argument('--rmax',
                     type=float,
                     default=20.0,
-                    help="Upper bound of radius (nm)."
+                    help="Upper bound of radius (nm). Must be >= rmin."
                     )
 sp.add_argument('--rpd',
                     type=float,
-                    default=1.1,
-                    help="Maximum polydispersity in radius. Must be > 1 for"
-                    " lognormal distribution, must be > 0 for all other cases."
+                    default=10.0,
+                    help="Maximum polydispersity (in percent) in radius."
+                    " Must be > 0."
                     )
 sp.add_argument('--pdist',
                     type=str,
@@ -69,18 +69,18 @@ sp.add_argument('--pdist',
 sp.add_argument('--pmin',
                     type=float,
                     default=20.0,
-                    help="Lower bound of pitch (nm)."
+                    help="Lower bound of pitch (nm). Must be > 0."
                     )
 sp.add_argument('--pmax',
                     type=float,
                     default=40.0,
-                    help="Upper bound of pitch (nm)."
+                    help="Upper bound of pitch (nm). Must be >= pmin."
                     )
 sp.add_argument('--ppd',
                     type=float,
-                    default=1.1,
-                    help="Maximum polydispersity in pitch. Must be > 1 for"
-                    " lognormal distribution, must be > 0 for all other cases."
+                    default=10.0,
+                    help="Maximum polydispersity (in percent )in pitch."
+                    " Must be > 0."
                     )
 sp.add_argument('--outfile',
                     type=str,
@@ -89,7 +89,7 @@ sp.add_argument('--outfile',
 sp.add_argument('--nsamp',
                     type=int,
                     default=10,
-                    help="Number of samples.")
+                    help="Number of samples. Must be >= 1.")
 sp.add_argument('--phi',
                     type=float,
                     default=0.001,
@@ -97,7 +97,7 @@ sp.add_argument('--phi',
 sp.add_argument('--npart',
                     type=int,
                     default=128,
-                    help="Number of nanoplatelets in each sample.")
+                    help="Number of nanoplatelets in each sample. Must be >= 1.")
 sp.add_argument('--calculator',
                     type=str,
                     choices=['AESDebye', 'Debyer'],
@@ -173,9 +173,33 @@ def run():
     elif args.subcommand == 'create':
         length = args.length*10 #From nm to angstrom
         width = args.width*10 #From nm to angstrom
-        nlayers = 2*args.ML + 1
-        radius = (args.rdist, args.rmin*10, args.rmax*10, args.rpd)
-        pitch = (args.pdist, args.pmin*10, args.pmax*10, args.ppd)
+        nlayers = 2*int(args.ML) + 1
+        if args.rmin <= 0:
+            raise ValueError(f"rmin(={args.rmin}) must be > 0.")
+        if args.rmax < args.rmin:
+            raise ValueError(f"rmax(={args.rmax}) must be"
+                             f" >= rmin(={args.rmin}).")
+        if args.rpd <= 0:
+            raise ValueError(f"rpd(={args.rpd}) must be > 0.")
+        if args.rdist == 'lognormal':
+            rpd = 1.0 + args.rpd/100.0
+        else:
+            rpd = args.rpd/100.0
+        radius = (args.rdist, args.rmin*10, args.rmax*10, rpd)
+
+        if args.pmin <= 0:
+            raise ValueError(f"pmin(={args.pmin}) must be > 0.")
+        if args.pmax < args.pmin:
+            raise ValueError(f"pmax(={args.pmax}) must be"
+                             f" >= pmin(={args.pmin}).")
+        if args.ppd <= 0:
+            raise ValueError(f"ppd(={args.ppd}) must be > 0.")
+        if args.pdist == 'lognormal':
+            ppd = 1.0 + args.ppd/100.0
+        else:
+            ppd = args.ppd/100.0
+        pitch = (args.pdist, args.pmin*10, args.pmax*10, ppd)
+
         nsamp = args.nsamp
         phi = args.phi
         npart = args.npart

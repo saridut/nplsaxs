@@ -170,13 +170,16 @@ def create(fn_out='out.npz', length=None, width=None, nlayers=None,
     Q_sample = None
     pattern_sample= None
     for isamp in range(nsamp):
-        if (isamp+1)%10 == 0:
-            print(f"isamp = {isamp}")
+        print(f"isamp = {isamp}")
         sample_rp(length, width, radius, pitch, rng, dist_pars[isamp,:],
                   r_vals, p_vals)
-        #print(f"Distribution parameters: {dist_pars[isamp,:]}")
+        print(f"  Distribution parameters: {dist_pars[isamp,0]/10}"
+              f" {(dist_pars[isamp,1]-1)*100} {dist_pars[isamp,2]/10}"
+              f" {(dist_pars[isamp,3]-1)*100}"
+              )
         for ipart in range(npart):
-            #print(f"  ipart = {ipart}")
+            if ( ipart%(100-1) == 0 ) or ( ipart == (npart-1) ):
+                print(f"  ipart = {ipart}")
             #print(f"  R={r_vals[ipart]}, P={p_vals[ipart]}")
             if p_vals[ipart] == 0.0:
                 npl.set_shape('Cylinder', radius=r_vals[ipart])

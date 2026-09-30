@@ -35,11 +35,11 @@ saxsds create \
     --rdist lognormal \
     --rmin 5 \
     --rmax 20 \
-    --rpd 1.2 \
+    --rpd 20 \
     --pdist lognormal \
     --pmin 10 \
     --pmax 50 \
-    --ppd 1.2 \
+    --ppd 20 \
     --outfile "${dn}/ds_${SLURM_ARRAY_TASK_ID}.npz" \
     --nsamp 2 \
     --phi 0.001 \
