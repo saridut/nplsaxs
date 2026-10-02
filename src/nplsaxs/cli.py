@@ -146,27 +146,32 @@ def run():
             raise SystemExit()
         else:
             print(f"Number of files = {nfiles}")
-            #Open the first file
+            #Get common data from the first file
             with np.load(fns[0]) as fh:
                 length = fh['length']
                 print(f"length = {length}")
                 width = fh['width']
                 print(f"width = {width}")
-                Q = fh['Q']
+                Q = fh['Q'].copy()
                 print(f"Q vector dimension = {Q.size}")
-                nsamp = fh['pattern'].shape[0]
-                print(f"Number of samples per file = {nsamp}")
-                pattern = np.zeros((nsamp*nfiles, Q.size), dtype=np.float64)
-                dist_pars = np.zeros((nsamp*nfiles,fh['dist_pars'].shape[1]),
-                                     dtype=np.float64)
-                print(f"Number of distribution parameters per sample"
-                      f" = {dist_pars.shape[1]}.")
+            #Read in data from all files into lists
+            dist_pars = []
+            pattern = []
             for i, fn in enumerate(fns):
-                with np.load(fn) as fh:
-                    ibeg = i*nsamp
-                    iend = (i+1)*nsamp
-                    dist_pars[ibeg:iend,:] = fh['dist_pars']
-                    pattern[ibeg:iend,:] = fh['pattern']
+                try:
+                    fh = np.load(fn)
+                except:
+                    continue
+                if fh:
+                    dist_pars.extend(list(fh['dist_pars']))
+                    pattern.extend(list(fh['pattern']))
+                    fh.close()
+            dist_pars = np.asarray(dist_pars, dtype=np.float64)
+            pattern = np.asarray(pattern, dtype=np.float64)
+            nsamp = pattern.shape[0]
+            print(f"Total number of samples = {nsamp}")
+            print(f"Number of distribution parameters per sample"
+                  f" = {dist_pars.shape[1]}.")
             fn_out = args.coutfile
             np.savez_compressed(fn_out, length=length, width=width,
                             dist_pars=dist_pars, Q=Q, pattern=pattern)
