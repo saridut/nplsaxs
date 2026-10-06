@@ -39,6 +39,14 @@ sp.add_argument('ML',
                     help="Number of monolayers. e.g. 1 ML CdSe means one layer"
                     " of Cd atoms + one layer of Se atoms + one layer of"
                     " Cd atoms.")
+sp.add_argument('--locns',
+                    type=float,
+                    default=0.0,
+                    help="Fractional distance of the neutral surface from the"
+                    " midsurface. Must be <= 0.5 and >= -0.5. Negative"
+                    " (positive) value indicates that the neutral surface is"
+                    " below (above) the midsurface."
+                    )
 sp.add_argument('--rdist',
                     type=str,
                     choices=['normal', 'lognormal', 'uniform'],
@@ -179,6 +187,7 @@ def run():
         length = args.length*10 #From nm to angstrom
         width = args.width*10 #From nm to angstrom
         nlayers = 2*int(args.ML) + 1
+        locns = args.locns
         if args.rmin <= 0:
             raise ValueError(f"rmin(={args.rmin}) must be > 0.")
         if args.rmax < args.rmin:
@@ -219,7 +228,7 @@ def run():
         debyer_cmd = args.debyer_cmd
         
         create(fn_out=fn_out, length=length, width=width, nlayers=nlayers,
-               radius=radius, pitch=pitch, nsamp=nsamp, phi=phi,
+               locns=locns, radius=radius, pitch=pitch, nsamp=nsamp, phi=phi,
                npart=npart, calculator=calculator,
                pattern_type=pattern_type, Qbeg=Qbeg, Qend=Qend,
                Qstep=Qstep, nthreads=nthreads, ncells=ncells,
