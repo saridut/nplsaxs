@@ -178,7 +178,7 @@ def create(fn_out='out.npz', length=None, width=None, nlayers=None,
               f" {(dist_pars[isamp,3]-1)*100}"
               )
         for ipart in range(npart):
-            if ( ipart%(100-1) == 0 ) or ( ipart == (npart-1) ):
+            if ( ipart==0 or (ipart+1)%10==0 or ipart==(npart-1) ):
                 print(f"  ipart = {ipart}")
             #print(f"  R={r_vals[ipart]}, P={p_vals[ipart]}")
             if p_vals[ipart] == 0.0:
