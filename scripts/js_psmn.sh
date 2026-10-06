@@ -18,6 +18,21 @@
 #module load foss/2025a
 #conda activate saxs
 
+# Completely disable threading in PyPI's OpenBLAS/NumPy
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+
+# Tell C++ library's libgomp to use the 4 Slurm cores
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+# CRITICAL: Prevent the two distinct libgomp engines from fighting 
+# over strict hardware pinning inside the Slurm cgroup
+export OMP_PROC_BIND=false #(or close)
+export OMP_PLACES=false #(or cores)
+export OMP_WAIT_POLICY=PASSIVE #Put idle threads to sleep
+#try #SBATCH --cpu-bind=none
+
+
 #export OMP_NUM_THREADS=${SLURM_CPUS_PER_TASK} 
 SLURM_ARRAY_TASK_ID=1
 
