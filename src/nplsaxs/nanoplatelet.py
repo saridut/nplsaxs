@@ -412,12 +412,25 @@ class Nanoplatelet(object):
                                            coordinates=self._atoms.positions)
             dc = aesdebye.DebyeCalculator(nThreads=nthreads, nCells=ncells,
                                           useMPI=False, useGPU=False,
-                                          verbose=False)
+                                          verbose=False, binsResolution=0.001)
             results = dc.calculateProfile(positions, start=beg, end=end+step,
                                           steps=1+int((end-beg)/step))
-            pdf, profile = results['total']
+            pdf, profile = results['Cd-Cd']
             Q = np.array(profile.q, copy=None)
-            pattern = np.array(profile.intensity, copy=None)
+            pattern_CdCd = np.array(profile.intensity, copy=None)
+
+            pdf, profile = results['Se-Se']
+            pattern_SeSe = np.array(profile.intensity, copy=None)
+
+            pdf, profile = results['Cd-Se']
+            pattern_CdSe = np.array(profile.intensity, copy=None)
+
+            pattern = pattern_CdCd + pattern_SeSe + 2*pattern_CdSe
+
+            #pdf, profile = results['total']
+            #Q = np.array(profile.q, copy=None)
+            #pattern = np.array(profile.intensity, copy=None)
+
             if fn is not None:
                 profile.toCSV(fn)
 
