@@ -150,13 +150,14 @@ def sample_rp(length, width, radius, pitch, rng, dist_pars,
 
 
 def create(fn_out='out.npz', length=None, width=None, nlayers=None,
-            radius=None, pitch=None, nsamp=1, phi=0.001, npart=128,
-            calculator='AESDebye', pattern_type='x', Qbeg=0.01,
-            Qend=1.0, Qstep=0.01, nthreads=-1, ncells=15,
+            locns=0.0, radius=None, pitch=None, nsamp=1, phi=0.001,
+            npart=128, calculator='AESDebye', pattern_type='x',
+            Qbeg=0.01, Qend=1.0, Qstep=0.01, nthreads=-1, ncells=15,
             debyer_cmd='debyer'):
     npl = Nanoplatelet()
     npl.set_xtal_unit_cell('CdSe', 'zincblende', 6.08, 6.08, 6.08)
-    npl.set_xtal_extents(length, width, None, bc='nnn', nlayers=nlayers)
+    npl.set_xtal_extents(length, width, None, bc='nnn', nlayers=nlayers,
+                         locns=locns)
     #Volume of a single particle
     npl_vol = npl.xtal_length * npl.xtal_width * npl.xtal_thickness
 
@@ -178,7 +179,7 @@ def create(fn_out='out.npz', length=None, width=None, nlayers=None,
               f" {(dist_pars[isamp,3]-1)*100}"
               )
         for ipart in range(npart):
-            if ( ipart%(100-1) == 0 ) or ( ipart == (npart-1) ):
+            if ( ipart==0 or (ipart+1)%10==0 or ipart==(npart-1) ):
                 print(f"  ipart = {ipart}")
             #print(f"  R={r_vals[ipart]}, P={p_vals[ipart]}")
             if p_vals[ipart] == 0.0:

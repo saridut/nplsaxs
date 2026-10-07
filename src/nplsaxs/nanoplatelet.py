@@ -143,7 +143,8 @@ class Nanoplatelet(object):
                                       cubic=True)
 
 
-    def set_xtal_extents(self, length, width, thickness, bc='nnn', nlayers=None):
+    def set_xtal_extents(self, length, width, thickness, bc='nnn',
+                         nlayers=None, locns=0):
         """
         Sets the extents and boundary conditions of the crystal.
 
@@ -163,6 +164,12 @@ class Nanoplatelet(object):
             Thickness of the crystal in nm
         nlayers : int | None
             Number of layers along the [0,0,1] direction.
+        locns : float
+            Fractional distance of the neutral surface from the midsurface.
+            Must be <= 0.5 and >= -0.5. A negative (positive) value indicates
+            that the neutral surface is below (above) the midsurface. If there
+            is a single layer `locns` is ignored.
+
         """
         for i in range(3):
             if bc[i] not in ['p', 'c', 'n']:
@@ -220,7 +227,7 @@ class Nanoplatelet(object):
                                     'nlayers': nlayers}
         self.ribbon = Ribbon(xtal_length, xtal_width, xtal_thickness,
                              self.bulk_uc.cell[0,0], self.bulk_uc.cell[1,1],
-                             None, ngpt=2)
+                             None, ngpt=2, locns=locns)
 
 
     def set_shape(self, shape, angle=None, **params):
