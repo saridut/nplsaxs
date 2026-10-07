@@ -20,6 +20,7 @@ requires-python = ">=3.11"
 dependencies = [
     "numpy >= 2.0.0",
     "scipy >= 1.18.0",
+    "ase >= 3.29.0 ",
     "rotlib @ git+https://github.com/saridut/rotlib.git/#subdirectory=python",
     "ribbon @ git+https://github.com/saridut/ribbon.git",
     "aesdebye @ git+https://github.com/saridut/AESDebye.git",
