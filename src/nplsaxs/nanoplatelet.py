@@ -239,7 +239,7 @@ class Nanoplatelet(object):
         shape : str
             Specifies the shape of the crystal in its current configuration.
         angle : None | float
-            Pass angle = 0 for no rotation.
+            Pass angle = np.pi/4 for no rotation.
         params : dict
             Shape parameters.
 
@@ -252,9 +252,9 @@ class Nanoplatelet(object):
 
         if angle is None:
             theta = self.ribbon.get_theta()
-            rotate_by = theta - np.pi/4
+            rotate_by = np.pi/4 - theta
         else:
-            rotate_by = angle - np.pi/4
+            rotate_by = np.pi/4 - angle
 
         a = self.xtal_cut_box_params['vectors'][0]
         b = self.xtal_cut_box_params['vectors'][1]
@@ -415,21 +415,21 @@ class Nanoplatelet(object):
                                           verbose=False, binsResolution=0.001)
             results = dc.calculateProfile(positions, start=beg, end=end+step,
                                           steps=1+int((end-beg)/step))
-            pdf, profile = results['Cd-Cd']
-            Q = np.array(profile.q, copy=None)
-            pattern_CdCd = np.array(profile.intensity, copy=None)
-
-            pdf, profile = results['Se-Se']
-            pattern_SeSe = np.array(profile.intensity, copy=None)
-
-            pdf, profile = results['Cd-Se']
-            pattern_CdSe = np.array(profile.intensity, copy=None)
-
-            pattern = pattern_CdCd + pattern_SeSe + 2*pattern_CdSe
-
-            #pdf, profile = results['total']
+            #pdf, profile = results['Cd-Cd']
             #Q = np.array(profile.q, copy=None)
-            #pattern = np.array(profile.intensity, copy=None)
+            #pattern_CdCd = np.array(profile.intensity, copy=None)
+
+            #pdf, profile = results['Se-Se']
+            #pattern_SeSe = np.array(profile.intensity, copy=None)
+
+            #pdf, profile = results['Cd-Se']
+            #pattern_CdSe = np.array(profile.intensity, copy=None)
+
+            #pattern = pattern_CdCd + pattern_SeSe + 2*pattern_CdSe
+
+            pdf, profile = results['total']
+            Q = np.array(profile.q, copy=None)
+            pattern = np.array(profile.intensity, copy=None)
 
             if fn is not None:
                 profile.toCSV(fn)
