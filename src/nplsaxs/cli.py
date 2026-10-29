@@ -98,6 +98,10 @@ sp.add_argument('--nsamp',
                     type=int,
                     default=10,
                     help="Number of samples. Must be >= 1.")
+sp.add_argument('--isamp_ofst',
+                    type=int,
+                    default=0,
+                    help="Offset in sample index (for sobol). Must be >= 0.")
 sp.add_argument('--phi',
                     type=float,
                     default=0.001,
@@ -215,6 +219,7 @@ def run():
         pitch = (args.pdist, args.pmin*10, args.pmax*10, ppd)
 
         nsamp = args.nsamp
+        isamp_ofst = args.isamp_ofst
         phi = args.phi
         npart = args.npart
         calculator = args.calculator
@@ -228,8 +233,10 @@ def run():
         debyer_cmd = args.debyer_cmd
         
         create(fn_out=fn_out, length=length, width=width, nlayers=nlayers,
-               locns=locns, radius=radius, pitch=pitch, nsamp=nsamp, phi=phi,
-               npart=npart, calculator=calculator,
+               locns=locns, radius=radius, pitch=pitch,
+               nsamp=nsamp, isamp_ofst=isamp_ofst,
+               phi=phi, npart=npart,
+               calculator=calculator,
                pattern_type=pattern_type, Qbeg=Qbeg, Qend=Qend,
                Qstep=Qstep, nthreads=nthreads, ncells=ncells,
                debyer_cmd=debyer_cmd)

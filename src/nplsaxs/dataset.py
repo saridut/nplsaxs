@@ -78,7 +78,7 @@ def get_rvs(dist, m, pd, rng, nrv=1, bounds=None, out=None):
     return np.squeeze(out)
 
 
-def sample_rp(length, width, radius, pitch, rng, dist_pars,
+def sample_rp(length, width, radius, pitch, rng, sobol, dist_pars,
                         r_vals, p_vals):
     """
     Draws a set of radius and pitch values.
@@ -111,10 +111,12 @@ def sample_rp(length, width, radius, pitch, rng, dist_pars,
     assert r_vals.size == p_vals.size
     #Sampling radius
     dist = radius[0]
-    m = rng.uniform(radius[1], radius[2]) #Mean or median (for lognormal)
+    #m = rng.uniform(radius[1], radius[2]) #Mean or median (for lognormal)
+    m = radius[1] + sobol[0]*(radius[2]-radius[1])
     #Polydispersity
     if dist == 'lognormal':
-        pd = rng.uniform(1.0, radius[3])
+        #pd = rng.uniform(1.0, radius[3])
+        pd = 1.0 + sobol[1]*(radius[3]-1.0)
     else:
         pd = rng.uniform(0.0, radius[3])
     dist_pars[0] = m
@@ -128,9 +130,11 @@ def sample_rp(length, width, radius, pitch, rng, dist_pars,
 
     #Sampling pitch
     dist = pitch[0]
-    m = rng.uniform(pitch[1], pitch[2])
+    #m = rng.uniform(pitch[1], pitch[2])
+    m = pitch[1] + sobol[2]*(pitch[2]-pitch[1])
     if dist == 'lognormal':
-        pd = rng.uniform(1.0, pitch[3])
+        #pd = rng.uniform(1.0, pitch[3])
+        pd = 1.0 + sobol[3]*(pitch[3]-1.0)
     else:
         pd = rng.uniform(0.0, pitch[3])
     dist_pars[2] = m
@@ -150,19 +154,25 @@ def sample_rp(length, width, radius, pitch, rng, dist_pars,
 
 
 def create(fn_out='out.npz', length=None, width=None, nlayers=None,
-            locns=0.0, radius=None, pitch=None, nsamp=1, phi=0.001,
+            locns=0.0, radius=None, pitch=None, nsamp=1, isamp_ofst=0, phi=0.001,
             npart=128, calculator='AESDebye', pattern_type='x',
             Qbeg=0.01, Qend=1.0, Qstep=0.01, nthreads=-1, ncells=15,
             debyer_cmd='debyer'):
+
+    #Read in Sobol sequence
+    sobol_seq = np.load(
+            Path('~/workspace/npl/nplsaxs/tests/sobol_4d.npy').expanduser()
+            )
+
     npl = Nanoplatelet()
-    npl.set_xtal_unit_cell('CdSe', 'zincblende', 6.08, 6.08, 6.08)
+    npl.set_xtal_unit_cell('CdSe', 'zincblende', 2*6.08, 2*6.08, 2*6.08)
     npl.set_xtal_extents(length, width, None, bc='nnn', nlayers=nlayers,
                          locns=locns)
     #Volume of a single particle
     npl_vol = npl.xtal_length * npl.xtal_width * npl.xtal_thickness
 
-    rng = np.random.default_rng()
-    #Distribution parameters. For each sample there are four parameters:
+    rng = np.random.default_rng() #Distribution parameters. 
+    # For each sample there are four parameters:
     #(1) median of radius (2) geometric standard derivation of radius
     #(3) median of pitch (4) geometric standard derivation of pitch
     dist_pars = np.zeros((nsamp,4), dtype=np.float64)
@@ -172,8 +182,9 @@ def create(fn_out='out.npz', length=None, width=None, nlayers=None,
     pattern_sample= None
     for isamp in range(nsamp):
         print(f"isamp = {isamp}")
-        sample_rp(length, width, radius, pitch, rng, dist_pars[isamp,:],
-                  r_vals, p_vals)
+        sobol = sobol_seq[isamp+isamp_ofst,:]
+        sample_rp(length, width, radius, pitch, rng, sobol,
+                  dist_pars[isamp,:], r_vals, p_vals)
         print(f"  Distribution parameters: {dist_pars[isamp,0]/10}"
               f" {(dist_pars[isamp,1]-1)*100} {dist_pars[isamp,2]/10}"
               f" {(dist_pars[isamp,3]-1)*100}"

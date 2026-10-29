@@ -197,7 +197,7 @@ class Nanoplatelet(object):
         else:
             self.nlayers = nlayers
             if self.nlayers == 1:
-                xtal_thickness = 0.0
+                xtal_thickness = 3.2 #Van de Waals diameter of Cd
             else:
                 atoms = ase.build.cut(self.bulk_uc, c=(0,0,self.bulk_uc.cell[2,2]), 
                             nlayers=self.nlayers, tolerance=0.001)
@@ -317,7 +317,9 @@ class Nanoplatelet(object):
         self.ribbon.translate_to_center()
         pmax = self.ribbon.grid.max(axis=(0,1,2), keepdims=False) 
         pmin = self.ribbon.grid.min(axis=(0,1,2), keepdims=False) 
-        self._atoms.cell = np.diag(pmax-pmin)
+        #print(pmax, pmin)
+        #TODO: fix the issue for a single layer with pmax = pmin
+        #self._atoms.cell = np.diag(pmax-pmin)
         self.origo = pmin.copy()
 
 
